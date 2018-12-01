@@ -291,7 +291,7 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                 </datalist>
                 <select name="service_type" class="select form-data" style="width: auto;">
                     #foreach($serviceType in $action.serviceTypes())
-                        <option value="$serviceType.name()">$serviceType.name()</option>
+                        <option value="$serviceType.name()">$serviceType.getDisplayName()</option>
                     #end
                 </select>
             </div>
