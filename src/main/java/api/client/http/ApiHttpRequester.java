@@ -83,6 +83,7 @@ public final class ApiHttpRequester {
     private HttpURLConnection buildConnection() throws IOException {
         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if (requestTimeout > 0) {
+            connection.setConnectTimeout(requestTimeout);
             connection.setReadTimeout(requestTimeout);
         }
         connection.setRequestMethod(httpMethod.name());

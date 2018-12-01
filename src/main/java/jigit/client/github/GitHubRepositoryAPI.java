@@ -3,7 +3,7 @@ package jigit.client.github;
 import com.google.gson.reflect.TypeToken;
 import jigit.client.github.dto.GitHubBranch;
 import jigit.client.github.dto.GitHubCommit;
-import jigit.common.APIHelper;
+import jigit.common.UrlActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +39,7 @@ public final class GitHubRepositoryAPI {
 
     @Nullable
     public GitHubBranch getBranch(@NotNull String branchName) throws IOException {
-        return gitHub.get('/' + REPOS_PATH + '/' + repository + '/' + BRANCHES_PATH + '/' + APIHelper.encode(branchName))
+        return gitHub.get('/' + REPOS_PATH + '/' + repository + '/' + BRANCHES_PATH + '/' + UrlActions.instance.encoded(branchName))
                 .withResultOf(GitHubBranch.class);
     }
 

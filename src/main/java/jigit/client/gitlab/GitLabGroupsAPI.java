@@ -2,10 +2,10 @@ package jigit.client.gitlab;
 
 import com.google.gson.reflect.TypeToken;
 import jigit.client.gitlab.dto.GitLabProject;
-import jigit.common.APIHelper;
 import jigit.common.NextPage;
 import jigit.common.NextPageFactory;
 import jigit.common.PageParam;
+import jigit.common.UrlActions;
 import jigit.indexer.api.GroupAPI;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,21 +20,17 @@ import java.util.Set;
 public final class GitLabGroupsAPI implements GroupAPI {
     private static final @NotNull Type LIST_OF_PROJECTS = new TypeToken<List<GitLabProject>>() {
     }.getType();
-    @NotNull
-    private static final String API_PATH = "/api/v4/groups";
-    @NotNull
-    private final GitLab gitLab;
+    private final @NotNull GitLab gitLab;
 
     public GitLabGroupsAPI(@NotNull GitLab gitLab) {
         this.gitLab = gitLab;
     }
 
-    @NotNull
-    public Collection<GitLabProject> repositories(@NotNull String groupName) throws IOException {
+    public @NotNull Collection<GitLabProject> repositories(@NotNull String groupName) throws IOException {
         final Set<GitLabProject> result = new LinkedHashSet<>();
         final NextPageFactory nextPageFactory = new NextPageFactory(
                 new NextPage(
-                        gitLab.fullPath(API_PATH + '/' + APIHelper.encode(groupName) + "/projects?" + PageParam.MAX)
+                        gitLab.fullPath("/groups/" + UrlActions.instance.encoded(groupName) + "/projects?" + PageParam.MAX)
                 )
         );
 

@@ -1,7 +1,6 @@
 package jigit.client.github;
 
 import api.client.http.ErrorListener;
-import jigit.indexer.repository.ServiceType;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
@@ -9,22 +8,17 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public final class GitHub extends ApiClient {
-    @NotNull
-    private static final List<String> TIME_FORMATS = Arrays.asList("yyyy/MM/dd HH:mm:ss ZZZZ", "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'");
-    @NotNull
-    private static final String SITE_API_URL = "https://api.github.com";
-    @NotNull
-    private static final String ENTERPRISE_API_SUFFIX = "/api/v3";
-    @NotNull
-    private final String oauthToken;
+    private static final @NotNull List<String> TIME_FORMATS = Arrays.asList("yyyy/MM/dd HH:mm:ss ZZZZ", "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'");
+    private final @NotNull String oauthToken;
     private final int requestTimeout;
-    @NotNull
-    private final ErrorListener errorListener;
+    private final @NotNull ErrorListener errorListener;
 
-    @NotNull
-    public static GitHub connect(@NotNull String serverUrl, @NotNull String oauthToken,
-                                 @NotNull ErrorListener errorListener, int requestTimeout) {
-        return new GitHub(serverUrl, oauthToken, requestTimeout, errorListener);
+    public GitHub(@NotNull String serverUrl, @NotNull String oauthToken, int requestTimeout,
+                  @NotNull ErrorListener errorListener) {
+        super(serverUrl);
+        this.oauthToken = oauthToken;
+        this.requestTimeout = requestTimeout;
+        this.errorListener = errorListener;
     }
 
     @NotNull
@@ -40,39 +34,25 @@ public final class GitHub extends ApiClient {
         throw new IllegalStateException("Unable to parse the timestamp: " + representation);
     }
 
-    private GitHub(@NotNull String serverUrl, @NotNull String oauthToken, int requestTimeout,
-                   @NotNull ErrorListener errorListener) {
-        super(getApiUrl(serverUrl));
-        this.oauthToken = oauthToken;
-        this.requestTimeout = requestTimeout;
-        this.errorListener = errorListener;
-    }
-
     @NotNull
-    public GitHubRepositoryAPI getRepositoryAPI(@NotNull String repository) {
+    public GitHubRepositoryAPI repositoryApi(@NotNull String repository) {
         return new GitHubRepositoryAPI(repository, this);
     }
 
     @NotNull
     @Override
-    protected ErrorListener getErrorListener() {
+    protected ErrorListener errorListener() {
         return errorListener;
     }
 
     @Override
-    protected int getRequestTimeout() {
+    protected int requestTimeout() {
         return requestTimeout;
     }
 
     @Override
     @NotNull
-    protected Map<String, String> getRequestParameters() {
+    protected Map<String, String> requestParameters() {
         return Collections.singletonMap("Authorization", "token " + oauthToken);
-    }
-
-    @NotNull
-    private static String getApiUrl(@NotNull String serverUrl) {
-        return ServiceType.isGitHubSite(serverUrl) ?
-                SITE_API_URL : (serverUrl.trim().replaceAll("/+$", "") + ENTERPRISE_API_SUFFIX);
     }
 }

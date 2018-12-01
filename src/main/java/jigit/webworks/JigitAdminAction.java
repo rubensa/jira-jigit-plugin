@@ -5,6 +5,7 @@ import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.sal.api.ApplicationProperties;
 import jigit.ao.CommitManager;
 import jigit.common.JigitDateFormatter;
+import jigit.common.UrlActions;
 import jigit.indexer.repository.RepoType;
 import jigit.indexer.repository.ServiceType;
 import jigit.settings.JigitRepo;
@@ -81,5 +82,9 @@ public final class JigitAdminAction extends JiraWebActionSupport {
 
     public @NotNull RepoType singleRepoType() {
         return RepoType.SingleRepository;
+    }
+
+    public @NotNull UrlActions urlActions() {
+        return UrlActions.instance;
     }
 }

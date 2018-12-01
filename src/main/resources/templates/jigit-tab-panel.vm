@@ -50,7 +50,7 @@
                              data-sha1="$!commit.getCommitSha1()"
                              src="$req.contextPath/download/resources/com.apanasevich.jira-jigit-plugin:jigit-tab-panel-resources/copy.png">
                         #if($repo && $fullName)
-                            <a href="${repo.getServerUrl()}/${fullName}/commit/$!{commit.getCommitSha1()}">
+                            <a href="$urlActions.withoutTrailingSlash(${repo.getServerUrl()})/${fullName}/commit/$!{commit.getCommitSha1()}">
                             $!commit.getCommitSha1().substring(0, 5)...
                         </a>
                         #else

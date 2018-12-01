@@ -4,7 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import jigit.client.gitlab.dto.GitLabBranch;
 import jigit.client.gitlab.dto.GitLabCommit;
 import jigit.client.gitlab.dto.GitLabFile;
-import jigit.common.APIHelper;
+import jigit.common.UrlActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public final class GitLabRepositoryAPI {
     private static final @NotNull Type LIST_OF_BRANCHES = new TypeToken<List<GitLabBranch>>() {
     }.getType();
     @NotNull
-    private static final String PROJECTS_PATH = "api/v4/projects";
+    private static final String PROJECTS_PATH = "projects";
     @NotNull
     private static final String BRANCHES_PATH = "repository/branches";
     @NotNull
@@ -33,7 +33,7 @@ public final class GitLabRepositoryAPI {
     public GitLabRepositoryAPI(@NotNull String repository, @NotNull GitLab gitLab) {
         this.gitLab = gitLab;
         try {
-            this.repositoryPath = '/' + PROJECTS_PATH + '/' + APIHelper.encode(repository);
+            this.repositoryPath = '/' + PROJECTS_PATH + '/' + UrlActions.instance.encoded(repository);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(e);
         }
@@ -47,7 +47,7 @@ public final class GitLabRepositoryAPI {
 
     @Nullable
     public GitLabBranch getBranch(@NotNull String branchName) throws IOException {
-        return gitLab.get(repositoryPath + '/' + BRANCHES_PATH + '/' + APIHelper.encode(branchName))
+        return gitLab.get(repositoryPath + '/' + BRANCHES_PATH + '/' + UrlActions.instance.encoded(branchName))
                 .withResultOf(GitLabBranch.class);
     }
 

@@ -58,7 +58,7 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                 </td>
                 <td data-val="$jigitRepo.getRepositoryId()" data-name="repository_id">
                     #set($repoId = $jigitRepo.getRepositoryId())
-                    <a href="${jigitRepo.getServerUrl()}/${repoId}">$repoId</a>
+                    <a href="$action.urlActions().withoutTrailingSlash(${jigitRepo.getServerUrl()})/${repoId}">$repoId</a>
                     <div data-val="$jigitRepo.getRepoType().name()" data-name="repo_type"><i>$i18n.getText(
                         'jigit.settings.table.columns.repo.type'): $i18n.getText(
                         "$jigitRepo.getRepoType().getDisplayName()")</i></div>
@@ -231,7 +231,7 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                 </datalist>
                 <select name="service_type" class="select form-data" style="width: auto;">
                     #foreach($serviceType in $action.serviceTypes())
-                        <option value="$serviceType.name()">$serviceType.name()</option>
+                        <option value="$serviceType.name()">$serviceType.getDisplayName()</option>
                     #end
                 </select>
             </div>

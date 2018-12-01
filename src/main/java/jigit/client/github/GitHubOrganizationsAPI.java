@@ -2,10 +2,10 @@ package jigit.client.github;
 
 import com.google.gson.reflect.TypeToken;
 import jigit.client.github.dto.GitHubOrganization;
-import jigit.common.APIHelper;
 import jigit.common.NextPage;
 import jigit.common.NextPageFactory;
 import jigit.common.PageParam;
+import jigit.common.UrlActions;
 import jigit.indexer.api.GroupAPI;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ public final class GitHubOrganizationsAPI implements GroupAPI {
         final Set<GitHubOrganization> result = new LinkedHashSet<>();
         final NextPageFactory nextPageFactory = new NextPageFactory(
                 new NextPage(
-                        gitHub.fullPath('/' + ORGS_PATH + '/' + APIHelper.encode(orgName) + "/repos?" + PageParam.MAX)
+                        gitHub.fullPath('/' + ORGS_PATH + '/' + UrlActions.instance.encoded(orgName) + "/repos?" + PageParam.MAX)
                 )
         );
 

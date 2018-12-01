@@ -7,6 +7,7 @@ import jigit.ao.CommitManager;
 import jigit.common.CommitActionHelper;
 import jigit.common.CommitDateHelper;
 import jigit.common.JigitDateFormatter;
+import jigit.common.UrlActions;
 import jigit.entities.Commit;
 import jigit.indexer.repository.GroupRepoName;
 import jigit.settings.JigitSettingsManager;
@@ -53,6 +54,7 @@ public final class JigitTabAction extends AbstractIssueAction {
         map.put("commitActionHelper", new CommitActionHelper());
         map.put("commitDateHelper", new CommitDateHelper());
         map.put("groupRepoNaming", GroupRepoName.Rule);
+        map.put("urlActions", UrlActions.instance);
     }
 
     @Nullable

@@ -25,40 +25,40 @@ public abstract class ApiClient {
 
     @NotNull
     public ApiHttpRequester get(@NotNull String endpointUrl) throws IOException {
-        return getApiHttpRequestor(getAPIUrl(endpointUrl));
+        return apiHttpRequester(apiUrl(endpointUrl));
     }
 
     @NotNull
     public ApiHttpRequester get(@NotNull URL url) throws IOException {
-        return getApiHttpRequestor(url);
+        return apiHttpRequester(url);
     }
 
     @NotNull
-    public String fullPath(@NotNull String tailAPIUrl) {
-        final String maybeSlash = tailAPIUrl.startsWith("/") ? "" : "/";
-        return apiUrl + maybeSlash + tailAPIUrl;
+    public String fullPath(@NotNull String url) {
+        final String maybeSlash = url.startsWith("/") ? "" : "/";
+        return apiUrl + maybeSlash + url;
     }
 
     @NotNull
-    private ApiHttpRequester getApiHttpRequestor(@NotNull URL url) {
-        return new ApiHttpRequester(url, getRequestTimeout(), getErrorListener(), getRequestParameters());
+    private ApiHttpRequester apiHttpRequester(@NotNull URL url) {
+        return new ApiHttpRequester(url, requestTimeout(), errorListener(), requestParameters());
     }
 
     @NotNull
-    protected abstract ErrorListener getErrorListener();
+    protected abstract ErrorListener errorListener();
 
     @NotNull
     public ApiHttpRequester post(@NotNull String endpointUrl) throws IOException {
-        return getApiHttpRequestor(getAPIUrl(endpointUrl)).withMethod(HttpMethod.POST);
+        return apiHttpRequester(apiUrl(endpointUrl)).withMethod(HttpMethod.POST);
     }
 
-    protected abstract int getRequestTimeout();
+    protected abstract int requestTimeout();
 
     @NotNull
-    protected abstract Map<String, String> getRequestParameters();
+    protected abstract Map<String, String> requestParameters();
 
     @NotNull
-    private URL getAPIUrl(@NotNull String tailAPIUrl) throws IOException {
-        return new URL(fullPath(tailAPIUrl));
+    private URL apiUrl(@NotNull String url) throws IOException {
+        return new URL(fullPath(url));
     }
 }
