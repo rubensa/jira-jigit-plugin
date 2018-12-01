@@ -5,9 +5,9 @@ import jigit.client.github.GitHub;
 import jigit.client.github.GitHubOrganizationsAPI;
 import jigit.client.github.GitHubRepositoryAPI;
 import jigit.client.gitlab.GitLab;
+import jigit.client.gitlab.GitLabApiVersion;
 import jigit.client.gitlab.GitLabGroupsAPI;
 import jigit.client.gitlab.GitLabRepositoryAPI;
-import jigit.common.UrlActions;
 import jigit.indexer.api.APIAdapter;
 import jigit.indexer.api.github.GitHubErrorListener;
 import jigit.indexer.api.github.GithubAPIAdapter;
@@ -30,7 +30,7 @@ public enum ServiceType {
         @NotNull
         public Collection<RepoInfo> repositories(@NotNull JigitRepo repo,
                                                  @NotNull JigitSettingsManager settingsManager) throws IOException {
-            return gitlabRepositories(repo, settingsManager, "/api/v4");
+            return gitlabRepositories(repo, settingsManager, GitLabApiVersion.v4);
         }
     },
     GitLab8("GitLab 8 or earlier") {
@@ -38,7 +38,7 @@ public enum ServiceType {
         @NotNull
         public Collection<RepoInfo> repositories(@NotNull JigitRepo repo,
                                                  @NotNull JigitSettingsManager settingsManager) throws IOException {
-            return gitlabRepositories(repo, settingsManager, "/api/v3");
+            return gitlabRepositories(repo, settingsManager, GitLabApiVersion.v3);
         }
     },
     GitHub("GitHub") {
@@ -46,10 +46,7 @@ public enum ServiceType {
         @NotNull
         public Collection<RepoInfo> repositories(@NotNull JigitRepo repo,
                                                  @NotNull JigitSettingsManager settingsManager) throws IOException {
-            final String serverUrl = UrlActions.instance.withoutTrailingSlash(repo.getServerUrl());
-            final String apiUrl = ServiceType.isGitHubSite(serverUrl) ?
-                    SITE_API_URL : (serverUrl + ENTERPRISE_API_SUFFIX);
-            final GitHub gitHub = new GitHub(apiUrl, repo.getToken(),
+            final GitHub gitHub = new GitHub(repo.getServerUrl(), repo.getToken(),
                     repo.getRequestTimeout(), new GitHubErrorListener(settingsManager, repo));
 
             return repo.getRepoType().repositories(repo, new GitHubOrganizationsAPI(gitHub), new Function<String, APIAdapter>() {
@@ -65,8 +62,6 @@ public enum ServiceType {
 
     public static final @NotNull Collection<ServiceType> values =
             Collections.unmodifiableList(Arrays.asList(ServiceType.values()));
-    private static final @NotNull String SITE_API_URL = "https://api.github.com";
-    private static final @NotNull String ENTERPRISE_API_SUFFIX = "/api/v3";
     private static final @NotNull Pattern GITHUB_URL_REGEXP = Pattern.compile("^.+github.com.*$", Pattern.CASE_INSENSITIVE);
 
     private final @NotNull String displayName;
@@ -78,9 +73,9 @@ public enum ServiceType {
     @NotNull
     private static Collection<RepoInfo> gitlabRepositories(@NotNull JigitRepo repo,
                                                            @NotNull JigitSettingsManager settingsManager,
-                                                           @NotNull String apiPath) throws IOException {
-        final GitLab gitLab = new GitLab(UrlActions.instance.withoutTrailingSlash(repo.getServerUrl()) + apiPath,
-                repo.getToken(), repo.getRequestTimeout(), GitLabErrorListener.INSTANCE);
+                                                           @NotNull GitLabApiVersion apiVersion) throws IOException {
+        final GitLab gitLab = new GitLab(repo.getServerUrl(), apiVersion, repo.getToken(),
+                repo.getRequestTimeout(), GitLabErrorListener.INSTANCE);
         final GitLabGroupsAPI groupsAPI = new GitLabGroupsAPI(gitLab);
 
         final GitLabAPIExceptionHandler apiExceptionHandler = new GitLabAPIExceptionHandler(settingsManager, repo);

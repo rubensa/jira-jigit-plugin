@@ -34,7 +34,7 @@ public final class GitLabAPIAdapter implements APIAdapter {
     public CommitAdapter getCommit(@NotNull String commitSha1) throws IOException {
         final GitLabCommit commit;
         try {
-            commit = repositoryAPI.getCommit(commitSha1);
+            commit = repositoryAPI.commit(commitSha1);
             requestsCounter.increase();
         } catch (APIException e) {
             throw apiExceptionHandler.handle(e);
@@ -49,7 +49,7 @@ public final class GitLabAPIAdapter implements APIAdapter {
     @Nullable
     public String getHeadCommitSha1(@NotNull String branch) throws IOException {
         try {
-            final GitLabBranch gitLabBranch = repositoryAPI.getBranch(branch);
+            final GitLabBranch gitLabBranch = repositoryAPI.branch(branch);
             requestsCounter.increase();
             return (gitLabBranch == null) ? null : gitLabBranch.getId();
         } catch (APIException e) {

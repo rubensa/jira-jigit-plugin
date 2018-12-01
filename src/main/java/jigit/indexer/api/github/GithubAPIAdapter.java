@@ -27,7 +27,7 @@ public final class GithubAPIAdapter implements APIAdapter {
     @NotNull
     @Override
     public CommitAdapter getCommit(@NotNull String commitSha1) throws IOException {
-        final GitHubCommit commit = repository.getCommit(commitSha1);
+        final GitHubCommit commit = repository.commit(commitSha1);
         if (commit == null) {
             throw new IllegalStateException("Something went wrong. Got null commit for sha1 = " + commitSha1);
         }
@@ -39,7 +39,7 @@ public final class GithubAPIAdapter implements APIAdapter {
     @Nullable
     @Override
     public String getHeadCommitSha1(@NotNull String branch) throws IOException {
-        final GitHubBranch gitHubBranch = repository.getBranch(branch);
+        final GitHubBranch gitHubBranch = repository.branch(branch);
         requestsCounter.increase();
         if (gitHubBranch == null) {
             return null;

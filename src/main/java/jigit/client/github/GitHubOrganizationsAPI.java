@@ -46,9 +46,7 @@ public final class GitHubOrganizationsAPI implements GroupAPI {
             if (values != null) {
                 result.addAll(values);
             }
-
         }
         return result;
-
     }
 }

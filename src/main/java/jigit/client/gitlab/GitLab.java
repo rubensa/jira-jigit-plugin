@@ -2,6 +2,7 @@ package jigit.client.gitlab;
 
 import api.client.http.ErrorListener;
 import jigit.client.github.ApiClient;
+import jigit.common.UrlActions;
 import org.jetbrains.annotations.NotNull;
 
 import javax.xml.bind.DatatypeConverter;
@@ -14,11 +15,12 @@ public final class GitLab extends ApiClient {
     private final int requestTimeout;
     private final @NotNull ErrorListener errorListener;
 
-    public GitLab(@NotNull String url,
+    public GitLab(@NotNull String serverUrl,
+                  @NotNull GitLabApiVersion apiVersion,
                   @NotNull String privateToken,
                   int requestTimeout,
                   @NotNull ErrorListener errorListener) {
-        super(url);
+        super(UrlActions.instance.withoutTrailingSlash(serverUrl) + apiVersion.apiPath());
         this.privateToken = privateToken;
         this.requestTimeout = requestTimeout;
         this.errorListener = errorListener;

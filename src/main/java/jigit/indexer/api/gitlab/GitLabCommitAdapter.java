@@ -69,7 +69,7 @@ public final class GitLabCommitAdapter implements CommitAdapter {
         final String commitSha1 = getCommitSha1();
         final GitLabFile[] commitDiffs;
         try {
-            commitDiffs = repositoryAPI.getCommitFiles(commitSha1);
+            commitDiffs = repositoryAPI.commitFiles(commitSha1);
             requestsCounter.increase();
         } catch (APIException e) {
             throw apiExceptionHandler.handle(e);
