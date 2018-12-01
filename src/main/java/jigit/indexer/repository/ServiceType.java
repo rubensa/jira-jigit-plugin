@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.regex.Pattern;
 
 public enum ServiceType {
     GitLab("GitLab") {
@@ -62,7 +61,6 @@ public enum ServiceType {
 
     public static final @NotNull Collection<ServiceType> values =
             Collections.unmodifiableList(Arrays.asList(ServiceType.values()));
-    private static final @NotNull Pattern GITHUB_URL_REGEXP = Pattern.compile("^.+github.com.*$", Pattern.CASE_INSENSITIVE);
 
     private final @NotNull String displayName;
 
@@ -87,10 +85,6 @@ public enum ServiceType {
                 return new GitLabAPIAdapter(repositoryAPI, apiExceptionHandler);
             }
         });
-    }
-
-    public static boolean isGitHubSite(@NotNull String serverUrl) {
-        return GITHUB_URL_REGEXP.matcher(serverUrl).matches();
     }
 
     @SuppressWarnings("unused") //used in velocity

@@ -1,5 +1,6 @@
 package jigit.settings;
 
+import jigit.client.github.GitHub;
 import jigit.indexer.repository.ServiceType;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +29,6 @@ public final class JigitServerTypeAdapterFactory extends PostProcessAdapterFacto
 
     @NotNull
     private ServiceType getServiceType(@NotNull JigitRepo jigitRepo) {
-        return ServiceType.isGitHubSite(jigitRepo.getServerUrl()) ? ServiceType.GitHub : ServiceType.GitLab;
+        return GitHub.isGitHubSite(jigitRepo.getServerUrl()) ? ServiceType.GitHub : ServiceType.GitLab;
     }
 }
