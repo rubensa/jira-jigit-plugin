@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.apanasevich</groupId>
     <artifactId>jira-jigit-plugin</artifactId>
-    <version>1.2.9</version>
+    <version>1.2.10</version>
     <organization>
         <name>Dmitrii Apanasevich</name>
         <url>apanasevich.d@gmail.com</url>
@@ -148,17 +148,13 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
+                <artifactId>jira-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
-                    <!-- TODO remove on production-->
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
-                    <productDataPath>aux_stuff/generated-test-resources.zip</productDataPath>
-                    <!-- TODO remove on production-->
                 </configuration>
             </plugin>
             <plugin>
@@ -173,7 +169,7 @@
     </build>
     <properties>
         <jira.version>7.0.0</jira.version>
-        <amps.version>6.2.1</amps.version>
+        <amps.version>8.0.0</amps.version>
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <ao.version>1.0.0</ao.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

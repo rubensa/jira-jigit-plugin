@@ -36,18 +36,18 @@ AJS.$(function () {
     }
 
     function preOpenDialogActions(interior) {
-        interior.find("[name='repo_type'").change(function () {
+        interior.find("[name='repo_type']").change(function () {
             if (!AJS.$(this).find("option[value='" + this.value + "']").attr("data-single-repo")) {
                 interior.find("[name='index_all_branches'], [name='def_branch']").prop("disabled", true);
                 interior.find("[name='index_all_branches'][value='true']").prop("checked", true);
             } else {
-                interior.find("[name='index_all_branches'], [name='def_branch']").removeProp("disabled");
+                interior.find("[name='index_all_branches'], [name='def_branch']").prop("disabled", false);
             }
         });
     }
 
     function serializeForm(form) {
-        var disabled = form.find(':disabled').removeProp('disabled');
+        var disabled = form.find(':disabled').prop('disabled', false);
         var serializedData = form.serialize();
         disabled.prop('disabled', true);
         return serializedData;
