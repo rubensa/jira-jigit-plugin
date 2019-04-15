@@ -6,6 +6,7 @@ import jigit.settings.JigitSettingsManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,9 +37,13 @@ public final class JigitIndexer {
                 if (!repo.isNeedToIndex()) {
                     continue;
                 }
-                for (IndexingWorker indexingWorker : indexingWorkerFactory.build(repo)) {
-                    completionService.submit(indexingWorker);
-                    futureTasks++;
+                try {
+                    for (IndexingWorker indexingWorker : indexingWorkerFactory.build(repo)) {
+                        completionService.submit(indexingWorker);
+                        futureTasks++;
+                    }
+                } catch(FileNotFoundException e){
+                    LOG.error("JigitIndexer::execute: FileNotFoundException: " + e.getMessage());
                 }
             }
         } catch (Exception e) {
