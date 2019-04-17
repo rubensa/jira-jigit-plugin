@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.text.ParseException;
@@ -54,6 +55,8 @@ final class IndexingWorker implements Callable<RepoInfo> {
         } catch (LimitExceededException ignored) {
             log.info("Repository request limit exceeded for " + repoInfo.getRepoName()
                     + ". Next indexing will start after " + new Date(repoInfo.getSleepTo()));
+        } catch (FileNotFoundException e) {
+            log.error("IndexingWorker::call: Couldn't index repo: " + repoInfo.getRepoName() + ". FileNotFoundException: " + e.getMessage());
         }
 
         return repoInfo;
