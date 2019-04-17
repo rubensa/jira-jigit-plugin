@@ -43,7 +43,7 @@ public final class JigitIndexer {
                         futureTasks++;
                     }
                 } catch(FileNotFoundException e){
-                    LOG.error("JigitIndexer::execute: FileNotFoundException: " + e.getMessage());
+                    LOG.error("JigitIndexer::execute: Couldn't index repo: " + repo.getRepoName() + ". FileNotFoundException: " + e.getMessage());
                 }
             }
         } catch (Exception e) {

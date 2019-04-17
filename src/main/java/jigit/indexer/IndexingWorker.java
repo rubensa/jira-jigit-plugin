@@ -56,7 +56,7 @@ final class IndexingWorker implements Callable<RepoInfo> {
             log.info("Repository request limit exceeded for " + repoInfo.getRepoName()
                     + ". Next indexing will start after " + new Date(repoInfo.getSleepTo()));
         } catch (FileNotFoundException e) {
-            log.error("IndexingWorker::call: FileNotFoundException: " + e.getMessage());
+            log.error("IndexingWorker::call: Couldn't index repo: " + repoInfo.getRepoName() + ". FileNotFoundException: " + e.getMessage());
         }
 
         return repoInfo;
