@@ -32,8 +32,7 @@ import java.util.concurrent.*;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("ClassWithTooManyFields")
 public final class JigitIndexerTest extends DBTester {
@@ -68,6 +67,9 @@ public final class JigitIndexerTest extends DBTester {
     @SuppressWarnings("NullableProblems")
     @NotNull
     private RepoInfo groupRepoInfo;
+    @SuppressWarnings("NullableProblems")
+    @NotNull
+    private IndexingWorkerFactory indexingWorkerFactory;
 
     @AfterClass
     public static void tearDownAll() {
@@ -84,9 +86,9 @@ public final class JigitIndexerTest extends DBTester {
         singleRepoInfo = repoInfoFactory.build(SINGLE_JIGIT_REPO).iterator().next();
         groupRepoInfo = repoInfoFactory.build(GROUP_JIGIT_REPO).iterator().next();
         repoDataCleaner = new RepoDataCleaner(commitManager, queueItemManager);
-        final IndexingWorkerFactory indexingWorkerFactory = new IndexingWorkerFactoryImpl(repoInfoFactory,
+        indexingWorkerFactory = spy(new IndexingWorkerFactoryImpl(repoInfoFactory,
                 queueItemManager, new PersistStrategyFactoryImpl(commitManager), commitManager,
-                repoDataCleaner, issueKeysExtractor);
+                repoDataCleaner, issueKeysExtractor));
         jigitIndexer = new JigitIndexer(jigitSettingsManager, indexingWorkerFactory);
         DisabledRepos.instance.markEnabled(singleRepoInfo.getRepoName());
         DisabledRepos.instance.markEnabled(groupRepoInfo.getRepoName());
@@ -94,13 +96,20 @@ public final class JigitIndexerTest extends DBTester {
 
     @Test
     public void singleRepoIndexed() {
-        indexRepo(SINGLE_JIGIT_REPO);
+        indexRepo(Collections.singleton(SINGLE_JIGIT_REPO));
         allCommitsAreIndexed(singleRepoInfo);
     }
 
     @Test
     public void groupRepoIndexed() {
-        indexRepo(GROUP_JIGIT_REPO);
+        indexRepo(Collections.singleton(GROUP_JIGIT_REPO));
+        allCommitsAreIndexed(groupRepoInfo);
+    }
+
+    @Test
+    public void groupRepoIndexedEvenIfSingleRepoProducesException() throws IOException {
+        doThrow(new IllegalArgumentException()).when(indexingWorkerFactory).build(eq(SINGLE_JIGIT_REPO));
+        indexRepo(Arrays.asList(SINGLE_JIGIT_REPO, GROUP_JIGIT_REPO));
         allCommitsAreIndexed(groupRepoInfo);
     }
 
@@ -114,7 +123,7 @@ public final class JigitIndexerTest extends DBTester {
                 SINGLE_JIGIT_REPO.getDefaultBranch(), SINGLE_JIGIT_REPO.isEnabled(), SINGLE_JIGIT_REPO.getRequestTimeout(),
                 SINGLE_JIGIT_REPO.getSleepTimeout(), SINGLE_JIGIT_REPO.getSleepRequests(),
                 SINGLE_JIGIT_REPO.isIndexAllBranches(), branches);
-        indexRepo(jigitRepoWithWrongBrachName);
+        indexRepo(Collections.singleton(jigitRepoWithWrongBrachName));
         allCommitsAreIndexed(singleRepoInfo);
     }
 
@@ -134,7 +143,7 @@ public final class JigitIndexerTest extends DBTester {
                 return Boolean.TRUE;
             }
         });
-        indexRepo(SINGLE_JIGIT_REPO);
+        indexRepo(Collections.singleton(SINGLE_JIGIT_REPO));
         assertTrue(futureResult.get());
         assertTrue(DisabledRepos.instance.disabled(singleRepoInfo.getRepoName()));
         final int commitsNumber = getEntityManager().count(Commit.class);
@@ -160,7 +169,7 @@ public final class JigitIndexerTest extends DBTester {
 
     private void noRepoDataAfterCleaning(final @NotNull JigitRepo jigitRepo,
                                          final @NotNull RepoInfo repoInfo) throws SQLException, ExecutionException, InterruptedException {
-        indexRepo(jigitRepo);
+        indexRepo(Collections.singleton(jigitRepo));
         final Future<Boolean> futureResult = executorService.submit(new Callable<Boolean>() {
             @NotNull
             @Override
@@ -256,11 +265,12 @@ public final class JigitIndexerTest extends DBTester {
         }
     }
 
-    private void indexRepo(final @NotNull JigitRepo jigitRepo) {
-        when(jigitSettingsManager.getJigitRepos())
-                .thenReturn(new HashMap<String, JigitRepo>() {{
-                    put(jigitRepo.getRepoName(), jigitRepo);
-                }});
+    private void indexRepo(@NotNull Collection<JigitRepo> repos) {
+        final HashMap<String, JigitRepo> settings = new HashMap<>(repos.size());
+        for (JigitRepo repo : repos) {
+            settings.put(repo.getRepoName(), repo);
+        }
+        when(jigitSettingsManager.getJigitRepos()).thenReturn(settings);
         jigitIndexer.execute();
     }
 }

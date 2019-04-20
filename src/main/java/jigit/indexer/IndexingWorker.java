@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.text.ParseException;
@@ -46,7 +45,7 @@ final class IndexingWorker implements Callable<RepoInfo> {
 
     @NotNull
     @Override
-    public RepoInfo call() throws IOException, InterruptedException, ParseException {
+    public RepoInfo call() {
         try {
             final Map<String, BranchIndexingMode> branchFPHandlers = getBranchIndexingModes();
             for (Map.Entry<String, BranchIndexingMode> entry : branchFPHandlers.entrySet()) {
@@ -55,8 +54,8 @@ final class IndexingWorker implements Callable<RepoInfo> {
         } catch (LimitExceededException ignored) {
             log.info("Repository request limit exceeded for " + repoInfo.getRepoName()
                     + ". Next indexing will start after " + new Date(repoInfo.getSleepTo()));
-        } catch (FileNotFoundException e) {
-            log.error("IndexingWorker::call: Couldn't index repo: " + repoInfo.getRepoName() + ". FileNotFoundException: " + e.getMessage());
+        } catch (Throwable t) {
+            log.error("Couldn't index repo: " + repoInfo.getRepoName(), t);
         }
 
         return repoInfo;
@@ -67,12 +66,12 @@ final class IndexingWorker implements Callable<RepoInfo> {
         try {
             indexingMode.getForcePushHandler().handle(branch);
             indexRepoBranch(branch);
-        } catch (IOException e) {
+        } catch (Throwable t) {
             if (indexingMode.isStopIndexingOnException()) {
-                throw e;
+                throw t;
             } else {
                 log.error("Got an error while indexing repository " + repoInfo.getRepoFullName()
-                        + " and branch " + branch, e);
+                        + " and branch " + branch, t);
             }
         }
     }

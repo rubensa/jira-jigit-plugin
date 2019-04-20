@@ -6,14 +6,15 @@ import jigit.settings.JigitSettingsManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class JigitIndexer {
     @NotNull
-    private static final Logger LOG = Logger.getLogger(JigitIndexer.class);
+    private static final Logger log = Logger.getLogger(JigitIndexer.class);
     private static final int THREAD_POOL_SIZE = 2;
     @NotNull
     private final JigitSettingsManager settingsManager;
@@ -29,40 +30,39 @@ public final class JigitIndexer {
     public void execute() {
         final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new JigitThreadFactory());
         final CompletionService<RepoInfo> completionService = new ExecutorCompletionService<>(executorService);
-        final Map<String, JigitRepo> jigitRepos = settingsManager.getJigitRepos();
-        int futureTasks = 0;
-
+        final int tasksCount = tasks(completionService).size();
         try {
-            for (JigitRepo repo : jigitRepos.values()) {
-                if (!repo.isNeedToIndex()) {
-                    continue;
-                }
-                try {
-                    for (IndexingWorker indexingWorker : indexingWorkerFactory.build(repo)) {
-                        completionService.submit(indexingWorker);
-                        futureTasks++;
-                    }
-                } catch(FileNotFoundException e){
-                    LOG.error("JigitIndexer::execute: Couldn't index repo: " + repo.getRepoName() + ". FileNotFoundException: " + e.getMessage());
-                }
-            }
-        } catch (Exception e) {
-            LOG.error("JigitIndexer::execute", e);
-        }
-
-        try {
-            for (int i = 0; i < futureTasks; i++) {
+            for (int i = 0; i < tasksCount; i++) {
                 final Future<RepoInfo> projectCompleted = completionService.take();
                 projectCompleted.get();
             }
         } catch (InterruptedException e) {
-            LOG.error("JigitIndexer::execute - InterruptedException", e);
+            log.error("Internal error", e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            LOG.error("JigitIndexer::execute - ExecutionException. Cause: ", e.getCause());
+            log.error("Internal error", e.getCause());
         } finally {
             executorService.shutdown();
         }
+    }
+
+    @NotNull
+    private Collection<Future<RepoInfo>> tasks(@NotNull CompletionService<RepoInfo> completionService) {
+        final Collection<Future<RepoInfo>> tasks = new ArrayList<>();
+        final Map<String, JigitRepo> jigitRepos = settingsManager.getJigitRepos();
+        for (JigitRepo repo : jigitRepos.values()) {
+            if (!repo.isNeedToIndex()) {
+                continue;
+            }
+            try {
+                for (IndexingWorker indexingWorker : indexingWorkerFactory.build(repo)) {
+                    tasks.add(completionService.submit(indexingWorker));
+                }
+            } catch (Throwable t) {
+                log.error("Couldn't index repo: " + repo.getRepoName(), t);
+            }
+        }
+        return tasks;
     }
 
     private static final class JigitThreadFactory implements ThreadFactory {
