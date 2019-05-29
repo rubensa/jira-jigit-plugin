@@ -2,12 +2,13 @@ package jigit.common;
 
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("UtilityClassWithoutPrivateConstructor")
-public final class CommitActionHelper {
+public enum CommitActionHelper {
+    Instance;
+
     @SuppressWarnings("unused")
     //used in velocity
     @Nullable
-    public static CommitAction parse(int id) {
+    public CommitAction parse(int id) {
         for (CommitAction action : CommitAction.values) {
             if (action.getId() == id) {
                 return action;

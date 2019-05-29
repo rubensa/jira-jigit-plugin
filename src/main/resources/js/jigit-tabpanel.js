@@ -28,8 +28,8 @@ if (JIRA.ViewIssueTabs && JIRA.ViewIssueTabs.onTabReady) {
                 return;
             }
             if (copyToClip(sha1)) {
-                element.animate({width: "24px"}, 50);
-                element.animate({width: "16px"}, 50);
+                element.animate({width: "24px", height: "24px"}, 50);
+                element.animate({width: "16px", height: "16px"}, 50);
             }
         });
     })

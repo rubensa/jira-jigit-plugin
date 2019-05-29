@@ -1,21 +1,5 @@
-.commit {
-    width: 100%;
-}
-
 .commit-change-set {
     width: 100%;
-}
-
-.commit th {
-    background-color: #f0f0f0;
-    padding: 5px 0 5px 3px;
-}
-
-.commit td {
-    padding: 5px 0 5px 3px;
-    vertical-align: top;
-    text-align: center;
-    border-top: 1px solid #f0f0f0;
 }
 
 .commit-change-set td {
@@ -26,11 +10,6 @@
 
 .commit-change-set tr:first-child td{
     border-top: 1px solid #f0f0f0;
-}
-
-.commit .message {
-    white-space: pre-wrap;
-    padding: 0 0 5px 0;
 }
 
 .change-set .action {
@@ -57,6 +36,14 @@
     cursor: pointer;
 }
 
-.sha1:hover .jigit-copy-to-clip {
+.sha1 {
+    float: right;
+}
+
+.jigit-commit-message {
+    white-space: pre-wrap;
+}
+
+.jigit-commit:hover .jigit-copy-to-clip {
     display: block;
 }

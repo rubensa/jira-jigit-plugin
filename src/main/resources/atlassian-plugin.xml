@@ -115,6 +115,7 @@
         <resource type="velocity" name="view" location="templates/jigit-tab-panel.vm"/>
         <supports-ajax-load>true</supports-ajax-load>
         <default>true</default>
+        <sortable>true</sortable>
     </issue-tabpanel>
 
     <web-resource key="jigit-tab-panel-resources" name="Jigit tab panel Web Resources">

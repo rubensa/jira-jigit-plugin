@@ -17,57 +17,49 @@
     </table>
 #end
 
-<div id="jigit-commits">
-    <table class="commit" cellpadding="0" cellspacing="0">
-        <thead>
-        <tr>
-            <th width="10%">Repository</th>
-            <th width="10%">Branch</th>
-            <th width="10%">Revision</th>
-            <th width="10%">Date</th>
-            <th width="10%">User</th>
-            <th>Message<br>Change set</th>
-        </tr>
-        </thead>
-        <tbody>
-        #foreach($commit in $commits)
-            <tr>
-                #set($fullName = "")
-                #if($commit.getRepoGroup())
-                    #set($repo = $repos.get($!commit.getRepoGroup()))
-                    #set($fullName = $groupRepoNaming.extractRepoFullName($!commit.getRepoName()))
+#set($fullName = "")
+#if($commit.getRepoGroup())
+    #set($repo = $repos.get($!commit.getRepoGroup()))
+    #set($fullName = $groupRepoNaming.extractRepoFullName($!commit.getRepoName()))
+#else
+    #set($repo = $repos.get($!commit.getRepoName()))
+    #if($repo)
+        #set($fullName = $repo.getRepositoryId())
+    #end
+#end
+
+#set ($prettyCreateDate = "$prettyFormatter.format($commitDateHelper.toLocal($commit.getCreatedAt()))")
+#set ($iso8601CreateDate = "$iso8601Formatter.format($commitDateHelper.toLocal($!commit.getCreatedAt()))")
+
+<div class="issue-data-block jigit-commit">
+    <div class="action-head">
+        <div class="sha1">
+            <div style="position: relative;">
+                <img class="jigit-copy-to-clip" title="Copy sha1 to clipboard" align="left"
+                     data-sha1="$commit.getCommitSha1()"
+                     src="$req.contextPath/download/resources/com.apanasevich.jira-jigit-plugin:jigit-tab-panel-resources/copy.png">
+            </div>
+        </div>
+        <div class="action-details">
+            $commit.getAuthor()
+            <span title="sha1: ${commit.getCommitSha1()}">
+                #if($repo && $fullName)
+                    <a href="$urlActions.withoutTrailingSlash(${repo.getServerUrl()})/${fullName}/commit/${commit.getCommitSha1()}">
+                        commited
+                    </a>
                 #else
-                    #set($repo = $repos.get($!commit.getRepoName()))
-                    #if($repo)
-                        #set($fullName = $repo.getRepositoryId())
-                    #end
+                    commited
                 #end
-                <td class="repo">$!commit.getRepoName()</td>
-                <td class="branch">$!commit.getBranch()</td>
-                <td class="sha1">
-                    <div style="position: relative;">
-                        <img class="jigit-copy-to-clip" title="Copy to clipboard" align="left"
-                             data-sha1="$!commit.getCommitSha1()"
-                             src="$req.contextPath/download/resources/com.apanasevich.jira-jigit-plugin:jigit-tab-panel-resources/copy.png">
-                        #if($repo && $fullName)
-                            <a href="$urlActions.withoutTrailingSlash(${repo.getServerUrl()})/${fullName}/commit/$!{commit.getCommitSha1()}">
-                            $!commit.getCommitSha1().substring(0, 5)...
-                        </a>
-                        #else
-                            <span title="$!commit.getCommitSha1()">
-                                $!commit.getCommitSha1().substring(0, 5)...
-                            </span>
-                        #end
-                    </div>
-                </td>
-                <td class="date">$!dateFormatter.format($commitDateHelper.toLocal($!commit.getCreatedAt()))</td>
-                <td class="author">$!commit.getAuthor()</td>
-                <td style="text-align: left;">
-                    <div class="message">$textutils.htmlEncode($!commit.getTitle())</div>
-                    #renderChangeSet($commit.getCommitDiffs())
-                </td>
-            </tr>
-        #end
-        </tbody>
-    </table>
+            </span>
+            <span class='date user-tz' title='$prettyCreateDate'>
+                <time class='livestamp' datetime='$iso8601CreateDate'>$prettyCreateDate</time>
+            </span> to $commit.getBranch() of $commit.getRepoName()
+        </div>
+    </div>
+    <div class="action-body">
+        <div class="jigit-commit-message">$textutils.htmlEncode($commit.getTitle())</div>
+    </div>
+    <div class="action-body">
+        #renderChangeSet($commit.getCommitDiffs())
+    </div>
 </div>

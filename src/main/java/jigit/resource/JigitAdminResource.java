@@ -66,6 +66,15 @@ public final class JigitAdminResource {
     }
 
     @NotNull
+    private static Response getReferrerResponse(@NotNull HttpServletRequest request) {
+        try {
+            return Response.seeOther(new URI(request.getHeader("referer"))).build();
+        } catch (URISyntaxException e) {
+            return Response.ok(e.getMessage()).status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @NotNull
     @POST
     @Path("repo/add")
     @Produces(MediaType.TEXT_HTML)
@@ -80,7 +89,7 @@ public final class JigitAdminResource {
                             @NotNull @FormParam("sleep_timeout") @DefaultValue("10") Integer sleepTimeout,
                             @NotNull @FormParam("sleep_requests") @DefaultValue("100") Integer sleepRequests,
                             @NotNull @FormParam("index_all_branches") @DefaultValue("false") Boolean indexAllBranches) {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -116,7 +125,7 @@ public final class JigitAdminResource {
                              @NotNull @FormParam("repository_id") @DefaultValue("") String repositoryId,
                              @NotNull @FormParam("def_branch") @DefaultValue("") String branch,
                              @NotNull @FormParam("request_timeout") @DefaultValue("10") Integer requestTimeout) {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -168,7 +177,7 @@ public final class JigitAdminResource {
                              @NotNull @FormParam("sleep_timeout") @DefaultValue("10") Integer sleepTimeout,
                              @NotNull @FormParam("sleep_requests") @DefaultValue("100") Integer sleepRequest,
                              @NotNull @FormParam("index_all_branches") @DefaultValue("false") Boolean indexAllBranches) {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -198,7 +207,7 @@ public final class JigitAdminResource {
     @Path("/repo/{repo:.+}/remove")
     @Produces(MediaType.TEXT_HTML)
     public Response removeRepo(@NotNull @PathParam("repo") @DefaultValue("") String repoName) {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -216,7 +225,7 @@ public final class JigitAdminResource {
     @Path("/repo/{repo:.+}/clear")
     @Produces(MediaType.TEXT_HTML)
     public Response clearRepo(@NotNull @PathParam("repo") @DefaultValue("") String repoName) throws InterruptedException, IOException {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -238,7 +247,7 @@ public final class JigitAdminResource {
     @Produces(MediaType.TEXT_HTML)
     public Response disableRepo(@NotNull @PathParam("repo") @DefaultValue("") String repoName,
                                 @Nullable @FormParam("enabled") Boolean enabled) {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -272,7 +281,7 @@ public final class JigitAdminResource {
     @Produces(MediaType.TEXT_HTML)
     public Response addBranch(@NotNull @PathParam("repo") @DefaultValue("") String repoName,
                               @NotNull @FormParam("branch") @DefaultValue("") String branch) {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -291,12 +300,17 @@ public final class JigitAdminResource {
     }
 
     @NotNull
+    private String repoTypeName(@NotNull JigitRepo jigitRepo) {
+        return i18n.getText(jigitRepo.getRepoType().getDisplayName());
+    }
+
+    @NotNull
     @POST
     @Path("/repo/{repo:.+}/branch/{branch:.+}/remove")
     @Produces(MediaType.TEXT_HTML)
     public Response removeBranch(@NotNull @PathParam("repo") @DefaultValue("") String repoName,
                                  @NotNull @PathParam("branch") @DefaultValue("") String branch) {
-        final Response response = checkUserPermissions(authCtx.getLoggedInUser(), Permissions.ADMINISTER);
+        final Response response = checkAdminPermissions(authCtx.getLoggedInUser());
         if (response != null) {
             return response;
         }
@@ -314,37 +328,14 @@ public final class JigitAdminResource {
         return getReferrerResponse(request);
     }
 
-    @NotNull
-    private String repoTypeName(@NotNull JigitRepo jigitRepo) {
-        return i18n.getText(jigitRepo.getRepoType().getDisplayName());
-    }
-
     @Nullable
-    private Response checkUserPermissions(@Nullable ApplicationUser user, int permission) {
-        Response resp = null;
-        final String errorMessage;
-
+    private Response checkAdminPermissions(@Nullable ApplicationUser user) {
         if (user == null) {
-            errorMessage = "User is not logged in";
-            resp = Response.ok(errorMessage).status(Response.Status.UNAUTHORIZED).build();
-        } else if (!permissionManager.hasPermission(permission, user)) {
-            errorMessage = "Invalid permissions for " + user.getName();
-            resp = Response.ok(errorMessage).status(Response.Status.FORBIDDEN).build();
+            return Response.ok("User is not logged in").status(Response.Status.UNAUTHORIZED).build();
         }
-
-        return resp;
-    }
-
-    @NotNull
-    private static Response getReferrerResponse(@NotNull HttpServletRequest request) {
-        final String referrer = request.getHeader("referer");
-        final URI uri;
-        try {
-            uri = new URI(referrer);
-        } catch (URISyntaxException e) {
-            return Response.ok(e.getMessage()).status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        if (!permissionManager.hasPermission(Permissions.ADMINISTER, user)) {
+            return Response.ok("Invalid permissions for " + user.getName()).status(Response.Status.FORBIDDEN).build();
         }
-
-        return Response.seeOther(uri).build();
+        return null;
     }
 }

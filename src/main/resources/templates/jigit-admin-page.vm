@@ -73,7 +73,8 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                                         <tr>
                                             <td>
                                                 $jigitRepo.getDefaultBranch()
-                                                <span class="aui-badge" title="Commits number">
+                                                <span class="aui-badge"
+                                                      title="$i18n.getText('jigit.settings.title.number.of.commits')">
                                                     $action.getCommitCount($jigitRepo.getRepoName(), $jigitRepo.getDefaultBranch())
                                             </span>
                                             </td>
@@ -90,7 +91,8 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                                     style="text-align: left;">
                                     <i>Index all branches</i>
                                     #if($action.singleRepoType() != $jigitRepo.getRepoType())
-                                        <span class="aui-badge" title="Commits number">
+                                        <span class="aui-badge"
+                                              title="$i18n.getText('jigit.settings.title.number.of.commits')">
                                             $action.getCommitCount($jigitRepo.getRepoName())
                                         </span>
                                     #end
@@ -104,7 +106,8 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                                             <tr>
                                                 <td>
                                                     $branch
-                                                    <span class="aui-badge" title="Commits number">
+                                                    <span class="aui-badge" title="$i18n.getText(
+                                                        'jigit.settings.title.number.of.commits')">
                                                         $action.getCommitCount($jigitRepo.getRepoName(), $branch)
                                         </span>
                                                 </td>
