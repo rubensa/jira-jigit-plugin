@@ -175,7 +175,7 @@ public final class CommitManagerImpl implements CommitManager {
                           @NotNull Collection<CommitFileAdapter> commitFileAdapters) throws ParseException {
         //TODO check ao.executeInTransaction https://bitbucket.org/acourtis/rdbms-plugin-examples
         final boolean firstCommit = commitAdapter.getParentSha1s().isEmpty();
-        final Date createdAt = CommitDateHelper.toUTC(commitAdapter.getCreatedAt());
+        final Date createdAt = CommitDateHelper.Instance.toUTC(commitAdapter.getCreatedAt());
         final Commit commit = create(commitAdapter.getCommitSha1(), commitAdapter.getTitle(), commitAdapter.getAuthorName(),
                 createdAt, repoGroupName, repoName, branchName, firstCommit);
 

@@ -11,17 +11,24 @@ import jigit.entities.Commit;
 import jigit.indexer.repository.GroupRepoName;
 import jigit.settings.JigitRepo;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 
 public final class JigitTabAction extends AbstractIssueAction {
+    @NotNull
+    private static final Logger log = LoggerFactory.getLogger(JigitTabAction.class);
     @NotNull
     private final DateTimeFormatter dateTimeFormatter;
     @NotNull
     private final Commit commit;
     @NotNull
     private final Map<String, JigitRepo> jigitRepos;
+    @NotNull
+    private Date localCommitDate;
 
     public JigitTabAction(@NotNull IssueTabPanelModuleDescriptor descriptor,
                           @NotNull DateTimeFormatter dateTimeFormatter,
@@ -31,6 +38,13 @@ public final class JigitTabAction extends AbstractIssueAction {
         this.dateTimeFormatter = dateTimeFormatter;
         this.commit = commit;
         this.jigitRepos = jigitRepos;
+        final Date commitDate = commit.getCreatedAt();
+        try {
+            localCommitDate = CommitDateHelper.Instance.toLocal(commitDate);
+        } catch (ParseException e) {
+            log.error("Couldn't parse date " + commitDate + " to local format", e);
+            localCommitDate = commitDate;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -41,7 +55,7 @@ public final class JigitTabAction extends AbstractIssueAction {
         map.put("commit", commit);
         map.put("repos", jigitRepos);
         map.put("commitActionHelper", CommitActionHelper.Instance);
-        map.put("commitDateHelper", new CommitDateHelper());
+        map.put("commitDate", localCommitDate);
         map.put("groupRepoNaming", GroupRepoName.Rule);
         map.put("urlActions", UrlActions.instance);
     }
@@ -49,6 +63,6 @@ public final class JigitTabAction extends AbstractIssueAction {
     @NotNull
     @Override
     public Date getTimePerformed() {
-        return commit.getCreatedAt();
+        return localCommitDate;
     }
 }

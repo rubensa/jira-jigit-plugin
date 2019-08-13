@@ -28,8 +28,8 @@
     #end
 #end
 
-#set ($prettyCreateDate = "$prettyFormatter.format($commitDateHelper.toLocal($commit.getCreatedAt()))")
-#set ($iso8601CreateDate = "$iso8601Formatter.format($commitDateHelper.toLocal($!commit.getCreatedAt()))")
+#set ($prettyCreateDate = "$prettyFormatter.format($commitDate)")
+#set ($iso8601CreateDate = "$iso8601Formatter.format($commitDate)")
 
 <div class="issue-data-block jigit-commit">
     <div class="action-head">
@@ -45,15 +45,15 @@
             <span title="sha1: ${commit.getCommitSha1()}">
                 #if($repo && $fullName)
                     <a href="$urlActions.withoutTrailingSlash(${repo.getServerUrl()})/${fullName}/commit/${commit.getCommitSha1()}">
-                        commited
+                        $i18n.getText("jigit-tab-panel.commits.commited")
                     </a>
                 #else
-                    commited
+                    $i18n.getText("jigit-tab-panel.commits.commited")
                 #end
             </span>
             <span class='date user-tz' title='$prettyCreateDate'>
                 <time class='livestamp' datetime='$iso8601CreateDate'>$prettyCreateDate</time>
-            </span> to $commit.getBranch() of $commit.getRepoName()
+            </span> $i18n.getText("jigit-tab-panel.commits.destination", $commit.getBranch(), $commit.getRepoName())
         </div>
     </div>
     <div class="action-body">
