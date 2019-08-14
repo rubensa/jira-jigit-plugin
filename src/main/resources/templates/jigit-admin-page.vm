@@ -303,7 +303,7 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                 <input type="password" name="token" class="text form-data" disabled/>
             </div>
             <div class="field-group">
-                <label for="change_token">Change token</label>
+                <label for="change_token">$i18n.getText("jigit.settings.table.columns.token.change")</label>
                 <input type="checkbox" name="change_token" id="change_token" class="checkbox form-data">
             </div>
             <div class="field-group">

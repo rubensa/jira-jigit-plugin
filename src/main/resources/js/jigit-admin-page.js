@@ -79,8 +79,8 @@ AJS.$(function () {
 
     function showDialog(interior, dialogId, headerText) {
         var dialog = new AJS.Dialog({
-            width: 600,
-            height: 600,
+            width: 650,
+            height: 630,
             id: dialogId
         });
 
