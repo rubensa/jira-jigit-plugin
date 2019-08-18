@@ -89,7 +89,7 @@ $webResourceManager.requireResource("com.apanasevich.jira-jigit-plugin:jigit-adm
                             <tr>
                                 <td data-val="true" data-name="index_all_branches"
                                     style="text-align: left;">
-                                    <i>Index all branches</i>
+                                    <i>$i18n.getText('jigit.settings.table.columns.repo.index.all.branches')</i>
                                     #if($action.singleRepoType() != $jigitRepo.getRepoType())
                                         <span class="aui-badge"
                                               title="$i18n.getText('jigit.settings.title.number.of.commits')">

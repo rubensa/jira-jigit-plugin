@@ -51,9 +51,10 @@
                     $i18n.getText("jigit-tab-panel.commits.commited")
                 #end
             </span>
+            $i18n.getText("jigit-tab-panel.commits.destination", $commit.getBranch(), $commit.getRepoName()) -
             <span class='date user-tz' title='$prettyCreateDate'>
                 <time class='livestamp' datetime='$iso8601CreateDate'>$prettyCreateDate</time>
-            </span> $i18n.getText("jigit-tab-panel.commits.destination", $commit.getBranch(), $commit.getRepoName())
+            </span>
         </div>
     </div>
     <div class="action-body">

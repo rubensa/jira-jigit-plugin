@@ -29,8 +29,8 @@
 .jigit-copy-to-clip {
     display: none;
     position: absolute;
-    right: 0;
-    top: 2px;
+    right: -5px;
+    top: -5px;
     height: 16px;
     width: 16px;
     cursor: pointer;
