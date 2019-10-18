@@ -59,7 +59,15 @@ public final class CommitManagerTest extends DBTester {
     @Test
     public void emptyCommitMessage() throws ParseException {
         final String issueKey = "KEY-1";
-        createCommitStuff(UUID.randomUUID().toString(), "master", singletonList(issueKey), "");
+        createCommitStuff(UUID.randomUUID().toString(), "master", singletonList(issueKey), "", "me");
+        final List<Commit> commits = getCommitManager().getCommits(singletonList(issueKey));
+        assertEquals(1, commits.size());
+    }
+
+    @Test
+    public void aCommitWithAnEmptyAuthorIsSaved() throws ParseException {
+        final String issueKey = "KEY-1";
+        createCommitStuff(UUID.randomUUID().toString(), "master", singletonList(issueKey), "", "");
         final List<Commit> commits = getCommitManager().getCommits(singletonList(issueKey));
         assertEquals(1, commits.size());
     }
@@ -104,13 +112,16 @@ public final class CommitManagerTest extends DBTester {
 
     private void createCommitStuff(@NotNull String branch, @NotNull List<String> issueKeys) throws ParseException {
         final String sha1 = UUID.randomUUID().toString();
-        createCommitStuff(sha1, branch, issueKeys, "Commit message for sha=" + sha1);
+        createCommitStuff(sha1, branch, issueKeys, "Commit message for sha=" + sha1, "me");
     }
 
-    private void createCommitStuff(@NotNull String sha1, @NotNull String branch,
-                                   @NotNull List<String> issueKeys, @NotNull String message) throws ParseException {
+    private void createCommitStuff(@NotNull String sha1,
+                                   @NotNull String branch,
+                                   @NotNull List<String> issueKeys,
+                                   @NotNull String message,
+                                   @NotNull String author) throws ParseException {
         final GitHubCommit.CommitInfo commitInfo = new GitHubCommit.CommitInfo(
-                new GitHubAuthor("me", "2016/01/02 12:00:00 UTC"), message);
+                new GitHubAuthor(author, "2016/01/02 12:00:00 UTC"), message);
         final GitHubCommit gitHubCommit = new GitHubCommit(sha1, commitInfo,
                 Collections.<GitHubCommit.ParentCommit>emptyList(), Collections.<GitHubCommit.File>emptyList());
         final GitHubCommit.File gitHubFile = new GitHubCommit.File("changed", "MyClass.java", "MyClass.java");

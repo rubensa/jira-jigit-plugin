@@ -25,11 +25,14 @@ import java.util.*;
 public final class CommitManagerImpl implements CommitManager {
     private static final int DELETE_BY = 500;
     @NotNull
+    private static final String EMPTY_COMMIT_MESSAGE_PLACEHOLDER = "<empty message>";
+    @NotNull
+    private static final String EMPTY_AUTHOR_PLACEHOLDER = "<empty author>";
+
+    @NotNull
     private final ActiveObjects ao;
     @NotNull
     private final ChangeHistoryManager changeHistoryManager;
-    @NotNull
-    private static final String EMPTY_COMMIT_MESSAGE_PLACEHOLDER = "<empty message>";
 
     public CommitManagerImpl(@NotNull ActiveObjects ao,
                              @NotNull ChangeHistoryManager changeHistoryManager) {
@@ -70,7 +73,7 @@ public final class CommitManagerImpl implements CommitManager {
         return ao.create(Commit.class,
                 new DBParam("COMMIT_SHA1", commitSha1),
                 new DBParam("TITLE", StringUtils.isBlank(title) ? EMPTY_COMMIT_MESSAGE_PLACEHOLDER : title),
-                new DBParam("AUTHOR", author),
+                new DBParam("AUTHOR", StringUtils.isBlank(author) ? EMPTY_AUTHOR_PLACEHOLDER : author),
                 new DBParam("CREATED_AT", createdAt),
                 new DBParam("FIRST_COMMIT", firstCommit),
                 new DBParam("REPO_GROUP", repoGroupName),

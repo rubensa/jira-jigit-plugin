@@ -2,33 +2,48 @@ package jigit.indexer;
 
 import jigit.indexer.api.CommitAdapter;
 import jigit.indexer.api.CommitFileAdapter;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
 import java.util.Collection;
-import java.util.Collections;
 
-public interface PersistStrategy {
+public abstract class PersistStrategy {
     @NotNull
-    PersistStrategy DO_NOTHING = new PersistStrategy() {
-        @NotNull
+    private static final Logger log = Logger.getLogger(PersistStrategy.class);
+    @NotNull
+    public static final PersistStrategy DO_NOTHING = new PersistStrategy() {
         @Override
-        public Collection<String> persist(@Nullable String repoGroupName,
-                                          @NotNull String repoName,
-                                          @NotNull String branch,
-                                          @NotNull CommitAdapter commitAdapter,
-                                          @NotNull Collection<String> issueKeys,
-                                          @NotNull Collection<CommitFileAdapter> commitFileAdapters) {
-            return Collections.emptyList();
+        public void persistThrowing(@Nullable String repoGroupName,
+                                    @NotNull String repoName,
+                                    @NotNull String branch,
+                                    @NotNull CommitAdapter commitAdapter,
+                                    @NotNull Collection<String> issueKeys,
+                                    @NotNull Collection<CommitFileAdapter> commitFileAdapters) {
+            //do nothing
         }
     };
 
-    @NotNull
-    Collection<String> persist(@Nullable String repoGroupName,
-                               @NotNull String repoName,
-                               @NotNull String branch,
-                               @NotNull CommitAdapter commitAdapter,
-                               @NotNull Collection<String> issueKeys,
-                               @NotNull Collection<CommitFileAdapter> commitFileAdapters) throws ParseException;
+    public final void persist(@Nullable String repoGroupName,
+                              @NotNull String repoName,
+                              @NotNull String branch,
+                              @NotNull CommitAdapter commitAdapter,
+                              @NotNull Collection<String> issueKeys,
+                              @NotNull Collection<CommitFileAdapter> commitFileAdapters) throws ParseException{
+        try {
+            persistThrowing(repoGroupName, repoName, branch, commitAdapter, issueKeys, commitFileAdapters);
+        } catch (Throwable t) {
+            log.error("Couldn't persist commit data. Commit sha1=" + commitAdapter.getCommitSha1() + ", repository group=" + repoGroupName
+                    + ", repository=" + repoName + ", branch=" + branch, t);
+            throw t;
+        }
+    }
+
+    public abstract void persistThrowing(@Nullable String repoGroupName,
+                                         @NotNull String repoName,
+                                         @NotNull String branch,
+                                         @NotNull CommitAdapter commitAdapter,
+                                         @NotNull Collection<String> issueKeys,
+                                         @NotNull Collection<CommitFileAdapter> commitFileAdapters) throws ParseException;
 }

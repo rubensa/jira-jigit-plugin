@@ -38,32 +38,28 @@ public final class PersistStrategyFactoryImpl implements PersistStrategyFactory 
         return persistAllDataStrategy;
     }
 
-    private final class PersistAllDataStrategy implements PersistStrategy {
-        @NotNull
+    private final class PersistAllDataStrategy extends PersistStrategy {
         @Override
-        public Collection<String> persist(@Nullable String repoGroupName,
-                                          @NotNull String repoName,
-                                          @NotNull String branch,
-                                          @NotNull CommitAdapter commitAdapter,
-                                          @NotNull Collection<String> issueKeys,
-                                          @NotNull Collection<CommitFileAdapter> commitFileAdapters) throws ParseException {
+        public void persistThrowing(@Nullable String repoGroupName,
+                                    @NotNull String repoName,
+                                    @NotNull String branch,
+                                    @NotNull CommitAdapter commitAdapter,
+                                    @NotNull Collection<String> issueKeys,
+                                    @NotNull Collection<CommitFileAdapter> commitFileAdapters) throws ParseException {
             commitManager.persist(commitAdapter, repoGroupName, repoName, branch, issueKeys, commitFileAdapters);
-            return commitAdapter.getParentSha1s();
         }
     }
 
     /*Strategy looks strange. But it needs to save dependent data again because persist method is not transactional.*/
-    private final class PersistDependentDataOnlyStrategy implements PersistStrategy {
-        @NotNull
+    private final class PersistDependentDataOnlyStrategy extends PersistStrategy {
         @Override
-        public Collection<String> persist(@Nullable String repoGroupName,
-                                          @NotNull String repoName,
-                                          @NotNull String branch,
-                                          @NotNull CommitAdapter commitAdapter,
-                                          @NotNull Collection<String> issueKeys,
-                                          @NotNull Collection<CommitFileAdapter> commitFileAdapters) {
+        public void persistThrowing(@Nullable String repoGroupName,
+                                    @NotNull String repoName,
+                                    @NotNull String branch,
+                                    @NotNull CommitAdapter commitAdapter,
+                                    @NotNull Collection<String> issueKeys,
+                                    @NotNull Collection<CommitFileAdapter> commitFileAdapters) {
             commitManager.persistDependent(commitAdapter, repoName, branch, issueKeys, commitFileAdapters);
-            return commitAdapter.getParentSha1s();
         }
     }
 }
