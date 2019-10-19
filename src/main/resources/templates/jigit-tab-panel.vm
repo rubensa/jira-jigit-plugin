@@ -51,9 +51,17 @@
                     $i18n.getText("jigit-tab-panel.commits.commited")
                 #end
             </span>
-            $i18n.getText("jigit-tab-panel.commits.destination",
-                "<b>$commit.getBranch()</b>",
-                "<a href='$urlActions.withoutTrailingSlash(${repo.getServerUrl()})/${fullName}'>$commit.getRepoName()</a>") -
+            #if($repo && $fullName)
+                $i18n.getText("jigit-tab-panel.commits.destination",
+                    "<b>$commit.getBranch()</b>",
+                    "
+                        <a href='$urlActions.withoutTrailingSlash(${repo.getServerUrl()})/${fullName}'>$commit.getRepoName()</a>")
+                -
+            #else
+                $i18n.getText(
+                    "jigit-tab-panel.commits.destination", "<b>$commit.getBranch()</b>", "<b>$commit.getRepoName()</b>")
+                -
+            #end
             <span class='date user-tz' title='$prettyCreateDate'>
                 <time class='livestamp' datetime='$iso8601CreateDate'>$prettyCreateDate</time>
             </span>
