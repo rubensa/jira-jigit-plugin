@@ -147,11 +147,11 @@ final class IndexingWorker implements Callable<RepoInfo> {
                 }
             }
 
-            persistStrategyFactory.
+            final Collection<String> nextCommits = persistStrategyFactory.
                     getStrategy(repoName, commitSha1, counter > skipCount).
                     persist(repoInfo.getRepoGroup(), repoName, branch, commitAdapter, issueKeys, commitDiffs);
             commitQueue.remove();
-            commitQueue.addAll(commitAdapter.getParentSha1s());
+            commitQueue.addAll(nextCommits);
         }
         if (DisabledRepos.instance.disabled(repoName)) {
             throw new InterruptedException("Indexing was interrupted from the outside.");
